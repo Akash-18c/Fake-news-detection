@@ -6,3 +6,4 @@ scikit-learn
 PyJWT
 bcrypt
 python-dotenv
+gunicorn
