@@ -3,12 +3,85 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#0f1117" />
+    <meta name="theme-color" content="#0d0f14" />
     <meta name="description" content="AI-powered multilingual fake news detector" />
     <title>FakeLens – Fake News Detector</title>
+    <style>
+      * { box-sizing: border-box; margin: 0; padding: 0; }
+      body { background: #0d0f14; }
+      #page-loader {
+        position: fixed; inset: 0; z-index: 9999;
+        background: #0d0f14;
+        display: flex; flex-direction: column;
+        align-items: center; justify-content: center; gap: 18px;
+        transition: opacity 0.45s ease, visibility 0.45s ease;
+      }
+      #page-loader.hide { opacity: 0; visibility: hidden; pointer-events: none; }
+      .pl-flower {
+        position: relative; width: 64px; height: 64px;
+        animation: pl-spin 2s linear infinite;
+      }
+      @keyframes pl-spin { to { transform: rotate(360deg); } }
+      .pl-petal {
+        position: absolute;
+        width: 21px; height: 32px; top: 50%; left: 50%;
+        border-radius: 50% 50% 40% 40% / 55% 55% 45% 45%;
+        transform-origin: 50% 100%;
+        background: #5b6af0;
+        animation: pl-breathe 2s ease-in-out infinite;
+      }
+      .pl-petal:nth-child(1) { transform: translateX(-50%) translateY(-100%) rotate(0deg);   animation-delay: 0s; }
+      .pl-petal:nth-child(2) { transform: translateX(-50%) translateY(-100%) rotate(72deg);  animation-delay: 0.4s; }
+      .pl-petal:nth-child(3) { transform: translateX(-50%) translateY(-100%) rotate(144deg); animation-delay: 0.8s; }
+      .pl-petal:nth-child(4) { transform: translateX(-50%) translateY(-100%) rotate(216deg); animation-delay: 1.2s; }
+      .pl-petal:nth-child(5) { transform: translateX(-50%) translateY(-100%) rotate(288deg); animation-delay: 1.6s; }
+      @keyframes pl-breathe {
+        0%,100% { opacity: 0.35; }
+        50%      { opacity: 1; }
+      }
+      .pl-core {
+        position: absolute; top: 50%; left: 50%;
+        transform: translate(-50%,-50%);
+        width: 13px; height: 13px; border-radius: 50%;
+        background: #fff;
+        box-shadow: 0 0 12px rgba(91,106,240,0.7), 0 0 4px #fff;
+        z-index: 2;
+      }
+      .pl-text {
+        font-family: system-ui, sans-serif;
+        font-size: 0.78rem;
+        color: rgba(255,255,255,0.4);
+        letter-spacing: 0.4px;
+      }
+    </style>
   </head>
   <body>
-    <noscript>You need to enable JavaScript to run this app.</noscript>
+    <!-- Page load flower spinner — hidden once React mounts -->
+    <div id="page-loader">
+      <div class="pl-flower">
+        <span class="pl-petal"></span>
+        <span class="pl-petal"></span>
+        <span class="pl-petal"></span>
+        <span class="pl-petal"></span>
+        <span class="pl-petal"></span>
+        <span class="pl-core"></span>
+      </div>
+      <p class="pl-text">Loading FakeLens...</p>
+    </div>
+
     <div id="root"></div>
+
+    <script>
+      // Hide loader as soon as React renders anything
+      const observer = new MutationObserver(() => {
+        const root = document.getElementById('root');
+        if (root && root.children.length > 0) {
+          const loader = document.getElementById('page-loader');
+          if (loader) loader.classList.add('hide');
+          observer.disconnect();
+        }
+      });
+      observer.observe(document.getElementById('root'), { childList: true });
+    </script>
   </body>
 </html>

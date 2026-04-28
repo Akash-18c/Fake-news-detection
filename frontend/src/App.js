@@ -1,9 +1,17 @@
 import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import "./App.css";
+import AuthPage from "./AuthPage";
 
 const API = "/api";
 axios.defaults.timeout = 15000;
+
+// attach token to every request
+axios.interceptors.request.use(cfg => {
+  const token = localStorage.getItem("fl_token");
+  if (token) cfg.headers.Authorization = `Bearer ${token}`;
+  return cfg;
+});
 
 function timeAgo(iso) {
   const diff = (Date.now() - new Date(iso)) / 1000;
@@ -69,6 +77,8 @@ function ThemeIcon({ dark }) {
 }
 
 export default function App() {
+  const [token, setToken]   = useState(localStorage.getItem("fl_token") || "");
+  const [userName, setUserName] = useState(localStorage.getItem("fl_name") || "");
   const [dark, setDark] = useState(true);
   const [text, setText] = useState("");
   const [result, setResult] = useState(null);
@@ -79,6 +89,22 @@ export default function App() {
   const [histLoading, setHistLoading] = useState(false);
   const areaRef = useRef(null);
 
+  const handleAuth = (tok, name) => {
+    setToken(tok);
+    setUserName(name);
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem("fl_token");
+    localStorage.removeItem("fl_name");
+    setToken("");
+    setUserName("");
+    setHistory([]);
+    setResult(null);
+    setText("");
+  };
+
+  // ── all hooks must be called before any early return ──
   useEffect(() => {
     document.documentElement.setAttribute("data-theme", dark ? "dark" : "light");
   }, [dark]);
@@ -89,7 +115,12 @@ export default function App() {
     catch { } finally { setHistLoading(false); }
   };
 
-  useEffect(() => { loadHistory(); }, []);
+  useEffect(() => {
+    if (token) loadHistory();
+  }, [token]);
+
+  // ── guard: show auth page if not logged in ──
+  if (!token) return <AuthPage onAuth={handleAuth} />;
 
   const submit = async (e) => {
     e.preventDefault();
@@ -136,6 +167,7 @@ export default function App() {
           <span className="nav-tag">Multilingual Fake News Detector</span>
 
           <div className="nav-actions">
+            <span className="nav-user">{userName}</span>
             <button className="icon-btn" onClick={() => { setDrawerOpen(true); loadHistory(); }} title="History">
               <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15.5 15.5"/>
@@ -144,6 +176,13 @@ export default function App() {
             </button>
             <button className="icon-btn" onClick={() => setDark(d => !d)} title="Toggle theme">
               <ThemeIcon dark={dark} />
+            </button>
+            <button className="icon-btn logout-btn" onClick={handleLogout} title="Logout">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+                <polyline points="16 17 21 12 16 7"/>
+                <line x1="21" y1="12" x2="9" y2="12"/>
+              </svg>
             </button>
           </div>
         </div>

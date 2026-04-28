@@ -1,5 +1,8 @@
 flask
 flask-cors
-pymongo
+pymongo[srv]
 joblib
 scikit-learn
+PyJWT
+bcrypt
+python-dotenv
