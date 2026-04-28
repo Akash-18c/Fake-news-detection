@@ -6,8 +6,11 @@ __pycache__/
 venv/
 env/
 
-# ML model files (large binary files — regenerate with train_model.py)
-*.pkl
+# ML model files — tracked so Render doesn't need to retrain
+# Telugu_F&R_News/*.pkl
+
+# But ignore label_map (not needed)
+Telugu_F&R_News/label_map.pkl
 
 # Node
 frontend/node_modules/
