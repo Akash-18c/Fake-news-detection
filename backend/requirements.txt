@@ -2,7 +2,7 @@ flask
 flask-cors
 pymongo[srv]
 joblib
-scikit-learn
+scikit-learn==1.8.0
 PyJWT
 bcrypt
 python-dotenv
